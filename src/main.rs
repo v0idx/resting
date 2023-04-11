@@ -1,3 +1,4 @@
+#![feature(addr_parse_ascii)]
 mod methods;
 
 use std::error::Error;
@@ -12,10 +13,6 @@ struct Cli {
     /// Optional network port to use
     #[arg(short, long, value_parser = clap::value_parser!(u16).range(1..))]
     port: Option<u16>,
-
-    /// Use ipv6
-    #[arg(short = '6' ,long = "v6")]
-    v6: bool,
 
     ///Specify a file to write to
     #[arg(short, long = "file", value_parser = clap::value_parser!(String))]
@@ -36,7 +33,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let cli = Cli::parse();
 
-    let out_str = make_request(cli.method.unwrap(), cli.addr.unwrap(), cli.file_path).await;    
+    let out_str = make_request(cli.method.unwrap(), cli.addr.unwrap(), cli.file_path, cli.port).await;    
 
     println!("{}", out_str);
 
