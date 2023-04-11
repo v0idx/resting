@@ -8,6 +8,7 @@ resting aims to be an all in one command line utility to make http requests, and
 Currently, resting is able to make head requests, a small start, but I'm excited to add future functionality. The response is currently outputed directly to console.
 
 #### TODO
+* Refactor codebase to be cleaner, and more rust-like
 * File output support
 * Other HTTP Request Type support
 * Authentication Support
