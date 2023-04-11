@@ -17,6 +17,10 @@ struct Cli {
     #[arg(short = '6' ,long = "v6")]
     v6: bool,
 
+    ///Specify a file to write to
+    #[arg(short, long = "file", value_parser = clap::value_parser!(String))]
+    file_path: Option<String>,
+
     /// What HTTP Method to use
     #[arg(value_enum)]
     method: Option<Method>,
@@ -32,7 +36,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let cli = Cli::parse();
 
-    let out_str = make_request(cli.method.unwrap(), cli.addr.unwrap()).await;
+    let out_str = make_request(cli.method.unwrap(), cli.addr.unwrap(), cli.file_path).await;    
 
     println!("{}", out_str);
 

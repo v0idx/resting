@@ -3,10 +3,10 @@ use reqwest::Response;
 use std::error::Error;
 
 use std::fs::File;
-use::std::path::Path;
+use::std::path::PathBuf;
 use std::io::prelude::*;
 
-pub async fn fmt_response(res: impl Future<Output = Result<Response, reqwest::Error>>) -> Result<String, Box<dyn Error>> {
+pub async fn fmt_response(res: impl Future<Output = Result<Response, reqwest::Error>>, file_path: Option<PathBuf>) -> Result<String, Box<dyn Error>> {
     let response = res.await?;
 
     let mut ret_string = String::new();
@@ -20,16 +20,19 @@ pub async fn fmt_response(res: impl Future<Output = Result<Response, reqwest::Er
 
     let body = response.text().await?;
 
-    if body.is_empty() {
-        return Ok(ret_string);
-    } else {
+    if !(body.is_empty()) {
         ret_string.push_str(format!("\nBody: {}", body).as_str());
+    }
+
+    if file_path.is_some() {
+        return write_out(ret_string, file_path.unwrap());
+    } else {
         return Ok(ret_string);
     }
 }
 
-pub fn write_out(output: String, path: &Path) -> Result<String, Box<dyn Error>> {
-    let mut file = File::create(path)?;
+pub fn write_out(output: String, path: PathBuf) -> Result<String, Box<dyn Error>> {
+    let mut file = File::create(&path)?;
     file.write_all(output.as_bytes())?;
     file.flush()?;
 
