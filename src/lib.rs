@@ -2,6 +2,9 @@ use reqwest::{Client, Response};
 use std::error::Error;
 use std::future::Future;
 use clap::ValueEnum;
+use std::path::Path;
+use std::fs::File;
+use std::io::prelude::*;
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
 pub enum Method {
@@ -67,4 +70,12 @@ pub async fn make_request(method: Method, uri: String) -> String {
     
     
     return String::new();
+}
+
+pub fn write_out(output: String, path: &Path) -> Result<String, Box<dyn Error>> {
+    let mut file = File::create(path)?;
+    file.write_all(output.as_bytes())?;
+    file.flush()?;
+
+    Ok(String::from(format!("Response written to: {}", path.to_string_lossy())))
 }
