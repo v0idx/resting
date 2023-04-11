@@ -1,6 +1,10 @@
+mod methods;
+
 use std::error::Error;
 use resting::Method;
 use clap::Parser;
+
+use crate::methods::requests;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -24,7 +28,7 @@ struct Cli {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    use resting::make_request;
+    use requests::make_request;
 
     let cli = Cli::parse();
 
