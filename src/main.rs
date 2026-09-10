@@ -6,6 +6,7 @@ use resting::Method;
 use clap::Parser;
 
 use crate::methods::requests;
+use crate::methods::conn;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
