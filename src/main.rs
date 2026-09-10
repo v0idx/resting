@@ -10,19 +10,19 @@ use crate::methods::requests;
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
-    /// Optional network port to use
+    /// Network port to use, if not defined in address string
     #[arg(short, long, value_parser = clap::value_parser!(u16).range(1..))]
     port: Option<u16>,
 
-    ///Specify a file to write to
+    ///Specify a file path to write response to
     #[arg(short, long = "file", value_parser = clap::value_parser!(String))]
     file_path: Option<String>,
 
-    /// What HTTP Method to use
+    /// Which HTTP Method to use
     #[arg(value_enum)]
     method: Option<Method>,
 
-    ///IP ADDR
+    ///IP Address to send the request to, optionally append the port after a `:`
     #[arg(value_parser = clap::value_parser!(String))]
     addr: Option<String>,
 }
@@ -31,7 +31,11 @@ struct Cli {
 async fn main() -> Result<(), Box<dyn Error>> {
     use requests::make_request;
 
+    let tmp_fp: Option<String> = None;
+
     let cli = Cli::parse();
+
+    // let out_str = make_request(Method::HEAD, "8.8.8.8".to_string(), tmp_fp, Some(80)).await;
 
     let out_str = make_request(cli.method.unwrap(), cli.addr.unwrap(), cli.file_path, cli.port).await;    
 

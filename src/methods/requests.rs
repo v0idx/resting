@@ -22,6 +22,11 @@ pub async fn make_request(method: Method, uri: String, file_path: Option<String>
             let ret_string = fmt_response(req, file_path).await;
             return ret_string.unwrap();
         },
+        Method::GET => {
+            let req = get(addr).await;
+            let ret_string = fmt_response(req, file_path).await;
+            return ret_string.unwrap();
+        }
         _ => println!(""),
     }
     
@@ -32,6 +37,14 @@ pub async fn make_request(method: Method, uri: String, file_path: Option<String>
 pub async fn head(uri: String) -> impl Future<Output = Result<Response, reqwest::Error>> {
     let client = Client::new();
     let request = client.head(uri);
+    let response = request.send();
+
+    return response;
+}
+
+pub async fn get(uri: String) -> impl Future<Output = Result<Response, reqwest::Error>> {
+    let client = Client::new();
+    let request = client.get(uri);
     let response = request.send();
 
     return response;
