@@ -1,3 +1,4 @@
+// Copyright (c) 2026, Eloise Nash
 #![feature(addr_parse_ascii)]
 mod methods;
 

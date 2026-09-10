@@ -1,3 +1,4 @@
+// Copyright (c) 2026, Eloise Nash
 use clap::ValueEnum;
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
