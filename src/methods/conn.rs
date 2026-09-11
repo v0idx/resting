@@ -51,20 +51,11 @@ pub fn create_config(sv_str: String) -> ClientConnection {
     }
 }
 
-pub fn create_tcp_connection(
-    sv_string: String,
-) -> Option<Stream<'static, ClientConnection, TcpStream>> {
-    let mut split_sv = sv_string.split(":");
-    let sv_addr = split_sv.next()?;
-    let sv_port = split_sv.next()?;
+pub fn create_tcp_connection<'a>(
+    stream: &'a mut TcpStream, input: &mut VecInput, client_conn: &'a mut ClientConnection
+) -> Option<Stream<'static, &'a mut ClientConnection, &'a mut TcpStream>> {
 
-    let mut sock = create_tcp_conn(sv_string.clone());
-
-    let mut input = VecInput::default();
-
-    let mut conn = create_config(sv_addr.to_string());
-
-    let tls = Stream::new(&mut input, &mut conn, &mut sock);
+    let tls = Stream::new(&mut input, &mut client_conn, &mut stream);
 
     Some(tls)
 }

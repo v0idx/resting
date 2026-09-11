@@ -1043,6 +1043,7 @@ dependencies = [
  "clap",
  "error-chain",
  "futures",
+ "log",
  "reqwest",
  "rustls",
  "rustls-aws-lc-rs",
