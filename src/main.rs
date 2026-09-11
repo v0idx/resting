@@ -2,12 +2,12 @@
 #![feature(addr_parse_ascii)]
 mod methods;
 
-use std::error::Error;
-use resting::Method;
 use clap::Parser;
+use resting::Method;
+use std::error::Error;
 
+// use crate::methods::conn;
 use crate::methods::requests;
-use crate::methods::conn;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -33,13 +33,19 @@ struct Cli {
 async fn main() -> Result<(), Box<dyn Error>> {
     use requests::make_request;
 
-    let tmp_fp: Option<String> = None;
+    // let tmp_fp: Option<String> = None;
 
     let cli = Cli::parse();
 
     // let out_str = make_request(Method::HEAD, "8.8.8.8".to_string(), tmp_fp, Some(80)).await;
 
-    let out_str = make_request(cli.method.unwrap(), cli.addr.unwrap(), cli.file_path, cli.port).await;    
+    let out_str = make_request(
+        cli.method.unwrap(),
+        cli.addr.unwrap(),
+        cli.file_path,
+        cli.port,
+    )
+    .await;
 
     println!("{}", out_str);
 

@@ -1,11 +1,11 @@
-use std::io::{Read, Write, stdout};
+use std::io::{stdout, Read, Write};
 use std::net::TcpStream;
 use std::sync::Arc;
 
-use rustls::{ClientConfig, RootCertStore, VecInput};
-use rustls_util::Stream;
 use rustls::pki_types::ServerName;
+use rustls::{ClientConfig, ClientConnection, RootCertStore, VecInput};
 use rustls_aws_lc_rs;
+use rustls_util::Stream;
 
 pub fn create_server_name(sv_str: String) -> ServerName<'static> {
     let sv_name = ServerName::try_from(sv_str);
@@ -25,10 +25,8 @@ pub fn create_tcp_conn(sv_string: String) -> TcpStream {
     }
 }
 
-pub fn build_to_arc(cfg: ClientConfig, sv_name: ServerName<'static>) -> Arc<ClientConfig> {
-    let mut conn = Arc::new(cfg)
-        .connect(sv_name)
-        .build();
+pub fn build_to_arc(cfg: ClientConfig, sv_name: ServerName<'static>) -> ClientConnection {
+    let conn = Arc::new(cfg).connect(sv_name).build();
 
     match conn {
         Ok(v) => return v,
@@ -36,14 +34,14 @@ pub fn build_to_arc(cfg: ClientConfig, sv_name: ServerName<'static>) -> Arc<Clie
     }
 }
 
-pub fn create_config(sv_str: String) -> Arc<ClientConfig> {
+pub fn create_config(sv_str: String) -> ClientConnection {
     let root_store = RootCertStore {
         roots: webpki_roots::TLS_SERVER_ROOTS.into(),
     };
 
     let sv_name = create_server_name(sv_str);
 
-    let mut config = ClientConfig::builder(rustls_aws_lc_rs::DEFAULT_PROVIDER.into())
+    let config = ClientConfig::builder(rustls_aws_lc_rs::DEFAULT_PROVIDER.into())
         .with_root_certificates(root_store)
         .with_no_client_auth();
 
@@ -53,22 +51,20 @@ pub fn create_config(sv_str: String) -> Arc<ClientConfig> {
     }
 }
 
-pub fn create_tcp_connection(sv_string: String) ->Option<Stream<'static>> {
+pub fn create_tcp_connection(
+    sv_string: String,
+) -> Option<Stream<'static, ClientConnection, TcpStream>> {
     let mut split_sv = sv_string.split(":");
     let sv_addr = split_sv.next()?;
     let sv_port = split_sv.next()?;
 
-    let mut sock = create_tcp_conn(sv_string);
+    let mut sock = create_tcp_conn(sv_string.clone());
 
     let mut input = VecInput::default();
 
-    let mut received_plaintext = Vec::new();
-
-    let mut output = Vec::new();
-
     let mut conn = create_config(sv_addr.to_string());
 
-    let tls = Stream::new(&mut input, &mut conn, &mut sock,);
+    let tls = Stream::new(&mut input, &mut conn, &mut sock);
 
-
+    Some(tls)
 }

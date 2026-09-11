@@ -1,17 +1,24 @@
-use std::future::Future;
 use reqwest::Response;
 use std::error::Error;
+use std::future::Future;
 
+use ::std::path::PathBuf;
 use std::fs::File;
-use::std::path::PathBuf;
 use std::io::prelude::*;
 
-pub async fn fmt_response(res: impl Future<Output = Result<Response, reqwest::Error>>, file_path: Option<PathBuf>) -> Result<String, Box<dyn Error>> {
+pub async fn fmt_response(
+    res: impl Future<Output = Result<Response, reqwest::Error>>,
+    file_path: Option<PathBuf>,
+) -> Result<String, Box<dyn Error>> {
     let response = res.await?;
 
     let mut ret_string = String::new();
 
-    let app_string = format!("Status Code: {} {}", response.status().as_str(), response.status().canonical_reason().unwrap());
+    let app_string = format!(
+        "Status Code: {} {}",
+        response.status().as_str(),
+        response.status().canonical_reason().unwrap()
+    );
 
     ret_string.push_str(app_string.as_str());
 
@@ -36,5 +43,8 @@ pub fn write_out(output: String, path: PathBuf) -> Result<String, Box<dyn Error>
     file.write_all(output.as_bytes())?;
     file.flush()?;
 
-    Ok(String::from(format!("Response written to: {}", path.to_string_lossy())))
+    Ok(String::from(format!(
+        "Response written to: {}",
+        path.to_string_lossy()
+    )))
 }

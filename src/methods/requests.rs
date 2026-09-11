@@ -1,11 +1,16 @@
-use resting::Method;
 use reqwest::{Client, Response};
+use resting::Method;
 use std::future::Future;
 use std::path::PathBuf;
 
 use crate::methods::files::fmt_response;
 
-pub async fn make_request(method: Method, uri: String, file_path: Option<String>, port: Option<u16>) -> String {
+pub async fn make_request(
+    method: Method,
+    uri: String,
+    file_path: Option<String>,
+    port: Option<u16>,
+) -> String {
     let mut addr: String;
     let file_path = to_path(file_path);
     if is_ip(&uri) {
@@ -14,23 +19,22 @@ pub async fn make_request(method: Method, uri: String, file_path: Option<String>
         addr = String::from(uri);
     }
     if port.is_some() {
-        addr.push_str(format!(":{}",port.unwrap()).as_str());
+        addr.push_str(format!(":{}", port.unwrap()).as_str());
     }
     match method {
         Method::HEAD => {
             let req = head(addr).await;
             let ret_string = fmt_response(req, file_path).await;
             return ret_string.unwrap();
-        },
+        }
         Method::GET => {
             let req = get(addr).await;
             let ret_string = fmt_response(req, file_path).await;
             return ret_string.unwrap();
         }
-        _ => println!(""),
+        _ => println!(),
     }
-    
-    
+
     return String::new();
 }
 
@@ -58,7 +62,6 @@ fn to_path(str: Option<String>) -> Option<PathBuf> {
     } else {
         return None;
     }
-    
 }
 
 fn is_ip(addr: &String) -> bool {
@@ -67,5 +70,4 @@ fn is_ip(addr: &String) -> bool {
         Ok(_) => return true,
         Err(_) => return false,
     }
-    
 }
